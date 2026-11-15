@@ -1,5 +1,8 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import { resolve } from 'node:path';
 import { z } from 'zod';
+
+dotenv.config({ path: resolve(process.cwd(), '../../.env') });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -9,7 +12,13 @@ const envSchema = z.object({
   SENTRY_DSN: z.string().default('')
 }).strict();
 
-const parsed = envSchema.safeParse(process.env);
+const parsed = envSchema.safeParse({
+  NODE_ENV: process.env.NODE_ENV,
+  API_PORT: process.env.API_PORT,
+  API_CORS_ORIGINS: process.env.API_CORS_ORIGINS,
+  MONGODB_URI: process.env.MONGODB_URI,
+  SENTRY_DSN: process.env.SENTRY_DSN
+});
 if (!parsed.success) {
   throw new Error(`Invalid environment configuration: ${parsed.error.issues.map((issue) => issue.path.join('.')).join(', ')}`);
 }
