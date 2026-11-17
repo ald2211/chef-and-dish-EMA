@@ -12,6 +12,7 @@ import { logger } from './shared/logging/logger.js';
 import { openApiDocument } from './shared/openapi/openapi.js';
 import { identityRouter } from './modules/identity/presentation/routes.js';
 import { healthRouter } from './modules/health/presentation/routes.js';
+import { eventsRouter } from './modules/events/presentation/routes.js';
 
 if (env.SENTRY_DSN) Sentry.init({ dsn: env.SENTRY_DSN, environment: env.NODE_ENV, sendDefaultPii: false, tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 0 });
 
@@ -28,6 +29,7 @@ app.use(pinoHttp({ logger, genReqId: (request, response) => {
 } }));
 app.use(express.json({ limit: '100kb' }));
 app.use('/api/v1', identityRouter);
+app.use('/api/v1/events', eventsRouter);
 app.use('/api/v1/health', healthRouter);
 if (env.NODE_ENV !== 'production') {
   app.get('/api/openapi.json', (_request, response) => response.json(openApiDocument));

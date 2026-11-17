@@ -25,3 +25,10 @@
 - Added admin-only `POST /api/v1/drivers` to provision a Clerk user ID as a DRIVER. Request validation is strict; it cannot set roles or reactivate inactive accounts, and existing non-driver roles are preserved and rejected.
 - Updated OpenAPI. API typecheck, lint, and OpenAPI validation passed; tests were not run.
 - Next: configure Clerk development keys and implement events with driver assignments and per-event authorization.
+
+## Phase 2 â€” Events
+
+- Added admin event creation and driver assignment, plus event list/detail endpoints scoped to the authenticated role and assigned driver IDs.
+- Event input is strict and bounded; assignments require an active DRIVER and use `$addToSet` to make repeats safe. OpenAPI covers the event endpoints.
+- API typecheck, lint, and OpenAPI validation passed; tests were not run.
+- Next: move to the next requested business module after confirming the remaining policy decisions that affect stock and billing.
