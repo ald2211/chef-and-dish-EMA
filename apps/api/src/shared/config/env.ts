@@ -11,7 +11,8 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1),
   SENTRY_DSN: z.string().default(''),
   CLERK_PUBLISHABLE_KEY: z.string().default(''),
-  CLERK_SECRET_KEY: z.string().default('')
+  CLERK_SECRET_KEY: z.string().default(''),
+  INITIAL_ADMIN_CLERK_USER_IDS: z.string().default('')
 }).strict().superRefine((value, context) => {
   if (Boolean(value.CLERK_PUBLISHABLE_KEY) !== Boolean(value.CLERK_SECRET_KEY)) {
     context.addIssue({ code: 'custom', path: ['CLERK_PUBLISHABLE_KEY'], message: 'Both Clerk keys must be configured together.' });
@@ -25,7 +26,8 @@ const parsed = envSchema.safeParse({
   MONGODB_URI: process.env.MONGODB_URI,
   SENTRY_DSN: process.env.SENTRY_DSN,
   CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
-  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY
+  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+  INITIAL_ADMIN_CLERK_USER_IDS: process.env.INITIAL_ADMIN_CLERK_USER_IDS
 });
 if (!parsed.success) {
   throw new Error(`Invalid environment configuration: ${parsed.error.issues.map((issue) => issue.path.join('.')).join(', ')}`);
@@ -34,5 +36,6 @@ if (!parsed.success) {
 export const env = {
   ...parsed.data,
   clerkConfigured: Boolean(parsed.data.CLERK_PUBLISHABLE_KEY && parsed.data.CLERK_SECRET_KEY),
-  corsOrigins: parsed.data.API_CORS_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean)
+  corsOrigins: parsed.data.API_CORS_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean),
+  initialAdminClerkUserIds: new Set(parsed.data.INITIAL_ADMIN_CLERK_USER_IDS.split(',').map((id) => id.trim()).filter(Boolean))
 };

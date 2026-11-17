@@ -19,4 +19,9 @@
 - API Clerk middleware is enabled only when both server keys are configured and validates authorized parties against the CORS origin allowlist. `/me` fails closed with a safe 503 when Clerk is not configured and a 401 for unauthenticated requests.
 - Added Clerk key names to `.env.example` and documented the protected endpoint in OpenAPI. No database user records or role assignment are implemented in this slice.
 - Verification: API/web lint and typecheck passed; OpenAPI validation passed. Test suite not run.
-- Next: configure Clerk development keys, add Mongo-backed ADMIN/DRIVER records and authorization, and decide the safe initial-admin provisioning method before adding invitations.
+- Added Mongo-backed identity records with `ADMIN`/`DRIVER` roles and active status. `/me` now resolves the app record and returns the role; unprovisioned or inactive accounts receive a safe 403.
+- Initial admin bootstrap is restricted to IDs in `INITIAL_ADMIN_CLERK_USER_IDS`; the ID only creates a missing record and never changes an existing role.
+- Updated OpenAPI and `.env.example`. API typecheck, lint, and OpenAPI validation passed; tests were not run.
+- Added admin-only `POST /api/v1/drivers` to provision a Clerk user ID as a DRIVER. Request validation is strict; it cannot set roles or reactivate inactive accounts, and existing non-driver roles are preserved and rejected.
+- Updated OpenAPI. API typecheck, lint, and OpenAPI validation passed; tests were not run.
+- Next: configure Clerk development keys and implement events with driver assignments and per-event authorization.
